@@ -1,0 +1,18 @@
+extends layout 
+
+block content 
+  h2.display-5 #{category.name}
+  p.lead #{category.description}
+
+  each item in categoryItems 
+    article
+      h3 
+        a(href=item.url) #{item.name} 
+      p.lead #{item.description}
+          div.d-flex
+            p #[strong Price:] $ 
+              span #{item.price}
+            if item.numberInStock > 0
+              p.ms-auto #[strong #{item.numberInStock}] in stock.
+            else 
+              p.ms-auto No stock.

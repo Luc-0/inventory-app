@@ -1,5 +1,9 @@
 extends layout
 
 block content
-  h1= title
-  p Welcome to #{title}
+  div.mt-4
+    h3= title
+    ul
+      each category in categoryList 
+        li.mt-2
+          a(href=category.url) #{category.name}

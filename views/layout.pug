@@ -2,6 +2,31 @@ doctype html
 html
   head
     title= title
+    link(href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous")
     link(rel='stylesheet', href='/stylesheets/style.css')
   body
-    block content
+    div.container 
+      nav.navbar.navbar-expand-sm.navbar-light
+        div.container-fluid
+          a.navbar-brand(href='/catalog') Plants Inventory
+          button.navbar-toggler(type='button' data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation")
+            span.navbar-toggler-icon 
+        div.collapse.navbar-collapse#navbarNavDropdown
+          ul.navbar-nav
+            li.nav-item
+              a.nav-link(href="/catalog") Categories
+            li.nav-item
+              a.nav-link(href="/catalog/items") Items
+            li.nav-item.dropdown 
+              a.nav-link.dropdown-toggle#navbarDropdownMenuLink(href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false") Create
+              ul.dropdown-menu(aria-labelledby="navbarDropdownMenuLink")
+                li 
+                  a.dropdown-item(href='/catalog/category/create') Category
+                li 
+                  a.dropdown-item(href='/catalog/item/create') Item
+
+
+      block content
+
+    script(src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4" crossorigin="anonymous")
+

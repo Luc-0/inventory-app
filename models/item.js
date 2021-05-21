@@ -9,8 +9,8 @@ const ItemSchema = new Schema({
   category: [{ type: Schema.Types.ObjectId, ref: 'Category' }],
 });
 
-ItemSchema.virtual('url').get(() => {
-  return '/item/' + this._id;
+ItemSchema.virtual('url').get(function () {
+  return '/catalog/item/' + this._id;
 });
 
 module.exports = mongoose.model('Item', ItemSchema);

@@ -1,9 +1,43 @@
+const Item = require('../models/item');
+
+const async = require('async');
+const { isValidObjectId } = require('mongoose');
+
 exports.itemList = (req, res, next) => {
-  res.end('NOT IMPLEMENTED' + req.path);
+  Item.find()
+    .populate('category', 'name')
+    .exec((err, items) => {
+      if (err) {
+        return next(err);
+      }
+
+      res.render('itemList', {
+        title: 'Items',
+        itemList: items,
+      });
+    });
 };
 
 exports.itemDetail = (req, res, next) => {
-  res.end('NOT IMPLEMENTED' + req.path);
+  if (!isValidObjectId(req.params.id)) {
+    return res.redirect('/catalog/items');
+  }
+
+  Item.findById(req.params.id)
+    .populate('category', 'name')
+    .exec((err, item) => {
+      if (err) {
+        return next(err);
+      }
+      if (!item) {
+        return res.redirect('/catalog/items');
+      }
+
+      res.render('itemDetail', {
+        title: item.name,
+        item: item,
+      });
+    });
 };
 
 // Create

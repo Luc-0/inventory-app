@@ -1,0 +1,49 @@
+extends layout 
+
+block content 
+  h2=title 
+
+  form.mt-3(method='POST' action='') 
+    div.form-group
+      div 
+        label.mt-3(for='name') Name
+        input#name.form-control(type="text" name='name' value=(item ? item.name : '') required='true')        
+        if errors && (errors.some((error) => error.param == 'name'))
+          ul.mt-2
+            each error in errors 
+              if (error.param == 'name')          
+                li #{error.msg}
+      div 
+        label.mt-3(for='description') Description
+        textarea#description.form-control(name="description" cols="30" rows="10" required='true') #{item ? item.description : ''}
+        if errors && (errors.some((error) => error.param == 'description'))
+          ul.mt-2
+            each error in errors 
+              if (error.param == 'description')          
+                li #{error.msg}
+    div.form-group.mt-4
+      label Category: 
+      div.row
+        each category in categories 
+          div.col-3
+            input.checkbox-input(type='checkbox' name='category' id=category._id value=category._id, checked=category.checked)
+            label.ms-1(for=category._id) #{category.name}
+    div.form-group.mt-4
+      div
+        label.me-2(for="numberInStock") Number in Stock
+        input#numberInStock.form-control(type='number' name='numberInStock' value=(item ? item.numberInStock : '') required='true' min='0' max='999')
+        if errors && (errors.some((error) => error.param == 'numberInStock'))
+          ul.mt-2
+            each error in errors 
+              if (error.param == 'numberInStock')          
+                li #{error.msg}
+      div
+        label.mx-2(for="price") Price
+        input#price.form-control(type='number' name='price' value=(item ? item.price : '') required='true' min='0' max='1000000')
+        if errors && (errors.some((error) => error.param == 'price'))
+          ul.mt-2
+            each error in errors 
+              if (error.param == 'price')          
+                li #{error.msg}
+
+    button.btn.btn-primary.mt-3(type='submit') #{btnText ? btnText : 'Create Item'}

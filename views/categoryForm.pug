@@ -1,0 +1,25 @@
+extends layout 
+
+block content 
+  h2=title 
+
+  form.mt-3(method='POST' action='')
+    div.form-group
+      div
+        label(for='name') Name
+        input#name.form-control.mt-2(type='text' name='name' placeholder='Bulb, Ivy, etc..' required='true' value=(category ? category.name : ''))
+        if errors
+          ul.m-0.mt-2
+            each error in errors 
+              if error.param == 'name'
+                li #{error.msg}
+      div 
+        label.mt-3(for="description") Description
+        input#description.form-control.mt-2(type='text' name='description' required='true' value=(category ? category.description : ''))
+        if errors
+          ul.m-0.mt-2        
+            each error in errors 
+              if error.param == 'description'
+                li #{error.msg}
+
+    button.btn.btn-primary.mt-3(type='submit') #{btnText ? btnText : 'Create Category'}

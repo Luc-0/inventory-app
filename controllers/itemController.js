@@ -1,7 +1,9 @@
 const Item = require('../models/item');
+const Category = require('../models/category');
 
 const async = require('async');
 const { isValidObjectId } = require('mongoose');
+const { body, validationResult } = require('express-validator');
 
 exports.itemList = (req, res, next) => {
   Item.find()
@@ -42,24 +44,254 @@ exports.itemDetail = (req, res, next) => {
 
 // Create
 exports.createGet = (req, res, next) => {
-  res.end('NOT IMPLEMENTED' + req.path);
+  Category.find({}, 'name').exec(function (err, categories) {
+    if (err) {
+      return next(err);
+    }
+
+    res.render('itemForm', {
+      title: 'Create Item',
+      categories: categories,
+    });
+  });
 };
-exports.createPost = (req, res, next) => {
-  res.end('NOT IMPLEMENTED' + req.path);
-};
+exports.createPost = [
+  (req, res, next) => {
+    if (!(req.body.category instanceof Array)) {
+      if (typeof req.body.category === 'undefined') {
+        req.body.category = [];
+      } else {
+        req.body.category = new Array(req.body.category);
+      }
+    }
+    next();
+  },
+  body('name')
+    .trim()
+    .escape()
+    .isLength({ min: 1, max: 50 })
+    .withMessage('Length must be 1-50 characters.'),
+  body('description')
+    .trim()
+    .escape()
+    .isLength({ min: 1 })
+    .withMessage('Description must be specified.')
+    .isLength({ max: 350 })
+    .withMessage('Max of 350 characters.'),
+  body('numberInStock')
+    .toInt()
+    .escape()
+    .isNumeric()
+    .withMessage('Only numbers')
+    .isInt({ min: 0, max: 999 })
+    .withMessage('Must be within 0-999 units'),
+  body('price')
+    .toFloat()
+    .escape()
+    .isNumeric()
+    .withMessage('Only numbers')
+    .isFloat({ min: 0, max: 1000000 })
+    .withMessage('Price must be in 0-1000000 range'),
+  body('category.*').escape(),
+  (req, res, next) => {
+    const result = validationResult(req);
+    const hasErrors = !result.isEmpty();
+
+    const item = new Item({
+      name: req.body.name,
+      description: req.body.description,
+      numberInStock: req.body.numberInStock,
+      price: req.body.price,
+      category: req.body.category,
+    });
+
+    if (hasErrors) {
+      Category.find({}, 'name', function (err, categories) {
+        if (err) {
+          return next(err);
+        }
+        const checkedCategories = categories.map((category) => {
+          if (item.category.includes(category._id.toString())) {
+            category.checked = true;
+            return category;
+          }
+          return category;
+        });
+
+        res.render('itemForm', {
+          title: 'Create Item',
+          item: item,
+          categories: checkedCategories,
+          errors: result.errors,
+        });
+      });
+      return;
+    }
+
+    item.save(function (err) {
+      if (err) {
+        return next(err);
+      }
+
+      res.redirect(item.url);
+    });
+  },
+];
 
 // update
 exports.updateGet = (req, res, next) => {
-  res.end('NOT IMPLEMENTED' + req.path);
+  if (!isValidObjectId(req.params.id)) {
+    res.redirect('/catalog/items');
+  }
+
+  async.parallel(
+    {
+      item: function (cb) {
+        Item.findById(req.params.id).exec(cb);
+      },
+      categories: function (cb) {
+        Category.find({}, 'name').exec(cb);
+      },
+    },
+    function (err, results) {
+      if (err) {
+        return next(err);
+      }
+
+      const { item, categories } = results;
+
+      if (!item) {
+        return res.redirect('/catalog/items');
+      }
+      const checkedCategories = categories.map((category) => {
+        if (item.category.includes(category._id.toString())) {
+          category.checked = true;
+          return category;
+        }
+        return category;
+      });
+
+      res.render('itemForm', {
+        title: 'Update Item',
+        btnText: 'Update',
+        item: item,
+        categories: checkedCategories,
+      });
+    }
+  );
 };
-exports.updatePost = (req, res, next) => {
-  res.end('NOT IMPLEMENTED' + req.path);
-};
+exports.updatePost = [
+  (req, res, next) => {
+    if (!(req.body.category instanceof Array)) {
+      if (typeof req.body.category === 'undefined') {
+        req.body.category = [];
+      } else {
+        req.body.category = new Array(req.body.category);
+      }
+    }
+    next();
+  },
+  body('name')
+    .trim()
+    .escape()
+    .isLength({ min: 1, max: 50 })
+    .withMessage('Length must be 1-50 characters.'),
+  body('description')
+    .trim()
+    .escape()
+    .isLength({ min: 1 })
+    .withMessage('Description must be specified.')
+    .isLength({ max: 350 })
+    .withMessage('Max of 350 characters.'),
+  body('numberInStock')
+    .toInt()
+    .escape()
+    .isNumeric()
+    .withMessage('Only numbers')
+    .isInt({ min: 0, max: 999 })
+    .withMessage('Must be within 0-999 units'),
+  body('price')
+    .toFloat()
+    .escape()
+    .isNumeric()
+    .withMessage('Only numbers')
+    .isFloat({ min: 0, max: 1000000 })
+    .withMessage('Price must be in 0-1000000 range'),
+  body('category.*').escape(),
+  (req, res, next) => {
+    const result = validationResult(req);
+    const hasErrors = !result.isEmpty();
+
+    const item = new Item({
+      name: req.body.name,
+      description: req.body.description,
+      numberInStock: req.body.numberInStock,
+      price: req.body.price,
+      category: req.body.category,
+      _id: req.params.id,
+    });
+
+    if (hasErrors) {
+      Category.find({}, 'name', function (err, categories) {
+        if (err) {
+          return next(err);
+        }
+        const checkedCategories = categories.map((category) => {
+          if (item.category.includes(category._id.toString())) {
+            category.checked = true;
+            return category;
+          }
+          return category;
+        });
+
+        res.render('itemForm', {
+          title: 'Update Item',
+          btnText: 'Update',
+          item: item,
+          categories: checkedCategories,
+          errors: result.errors,
+        });
+      });
+      return;
+    }
+
+    Item.findByIdAndUpdate(req.params.id, item, function (err, updatedItem) {
+      if (err) {
+        return next(err);
+      }
+
+      res.redirect(updatedItem.url);
+    });
+  },
+];
 
 // delete
 exports.deleteGet = (req, res, next) => {
-  res.end('NOT IMPLEMENTED' + req.path);
+  if (!isValidObjectId(req.params.id)) {
+    return res.redirect('/catalog/items');
+  }
+
+  Item.findById(req.params.id)
+    .populate('category', 'name')
+    .exec(function (err, item) {
+      if (err) {
+        return next(err);
+      }
+      if (!item) {
+        return res.redirect('/catalog/items');
+      }
+
+      res.render('itemDelete', {
+        item: item,
+      });
+    });
 };
 exports.deletePost = (req, res, next) => {
-  res.end('NOT IMPLEMENTED' + req.path);
+  Item.findByIdAndDelete(req.body.itemId, function (err) {
+    if (err) {
+      return next(err);
+    }
+
+    res.redirect('/catalog/items');
+  });
 };

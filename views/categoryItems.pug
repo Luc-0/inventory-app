@@ -4,6 +4,10 @@ block content
   h2.display-5 #{category.name}
   p.lead #{category.description}
 
+  div.mb-5
+    a(href=category.url + '/update') Update
+    a.ms-2(href=category.url + '/delete') Delete
+
   each item in categoryItems 
     article
       h3 
@@ -16,3 +20,5 @@ block content
               p.ms-auto #[strong #{item.numberInStock}] in stock.
             else 
               p.ms-auto No stock.
+  else 
+    p No items for this category.

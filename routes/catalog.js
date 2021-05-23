@@ -30,9 +30,6 @@ router.get('/category/:id', categoryController.categoryItems);
 // Item list
 router.get('/items', itemController.itemList);
 
-// Item detail
-router.get('/item/:id', itemController.itemDetail);
-
 // Create item
 router.get('/item/create', itemController.createGet);
 router.post('/item/create', itemController.createPost);
@@ -44,5 +41,8 @@ router.post('/item/:id/update', itemController.updatePost);
 // Delete item
 router.get('/item/:id/delete', itemController.deleteGet);
 router.post('/item/:id/delete', itemController.deletePost);
+
+// Item detail
+router.get('/item/:id', itemController.itemDetail);
 
 module.exports = router;

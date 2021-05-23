@@ -1,0 +1,26 @@
+extends layout 
+
+block content 
+  h2 Delete Item 
+
+  if item.category.length > 0
+    p.fs-6 #[strong Category: ]
+      each category, index in item.category
+        if index == item.category.length - 1
+          a(href=category.url) #{category.name}
+        else 
+          a(href=category.url) #{category.name + ', '}
+  p #[strong Name: ]
+    a(href=item.url) #{item.name} 
+  p #[strong Description: ] #{item.description}
+  p #[strong Price:] $#{item.price}
+  p #[strong Number in stock: ] #{item.numberInStock}
+
+  div.mt-2
+    p Do you really want to delete this item?
+  
+  form(method='POST' action='')
+    div.form-group
+      input#itemId(type='hidden' name='itemId' required='true' value=item._id )
+    button.btn.btn-primary(type='submit') Delete
+

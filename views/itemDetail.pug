@@ -2,12 +2,13 @@ extends layout
 
 block content 
   h2.display-3.mt-5=title
-  p.fs-6 #[strong Category: ]
-    each category, index in item.category
-      if index == item.category.length - 1
-        a(href=category.url) #{category.name}
-      else 
-        a(href=category.url) #{category.name + ', '}
+  if item.category.length > 0
+    p.fs-6 #[strong Category: ]
+      each category, index in item.category
+        if index == item.category.length - 1
+          a(href=category.url) #{category.name}
+        else 
+          a(href=category.url) #{category.name + ', '}
   p.fs-6 #[strong Description: ] 
     span.lead #{item.description}
   div.d-flex
@@ -17,4 +18,7 @@ block content
       p.fs-6.ms-auto #[strong #{item.numberInStock}] in stock.
     else 
       p.fs-6.ms-auto No stock.
+  div.mt-5
+    a(href=item.url + '/update') Update 
+    a.ms-2(href=item.url + '/delete') Delete 
     

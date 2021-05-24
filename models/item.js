@@ -7,6 +7,10 @@ const ItemSchema = new Schema({
   numberInStock: { type: Number, required: true, min: 0, max: 999 },
   price: { type: Number, required: true, min: 0, max: 1000000 },
   category: [{ type: Schema.Types.ObjectId, ref: 'Category' }],
+  img: {
+    data: Buffer,
+    contentType: String,
+  },
 });
 
 ItemSchema.virtual('url').get(function () {

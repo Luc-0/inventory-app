@@ -3,7 +3,7 @@ extends layout
 block content 
   h2=title 
 
-  form.mt-3(method='POST' action='') 
+  form.mt-3(method='POST' action='' enctype='multipart/form-data') 
     div.form-group
       div 
         label.mt-3(for='name') Name
@@ -45,5 +45,13 @@ block content
             each error in errors 
               if (error.param == 'price')          
                 li #{error.msg}
+    div.form-gorup.mt-4 
+      input(type="file" name='photo')
+      if errors && (errors.some((error) => error.param == 'photo'))
+          ul.mt-2
+            each error in errors 
+              if (error.param == 'photo')          
+                li #{error.msg}
+
 
     button.btn.btn-primary.mt-3(type='submit') #{btnText ? btnText : 'Create Item'}

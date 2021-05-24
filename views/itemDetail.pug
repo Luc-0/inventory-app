@@ -11,6 +11,10 @@ block content
           a(href=category.url) #{category.name + ', '}
   p.fs-6 #[strong Description: ] 
     span.lead #{item.description}
+  if item.img.data
+    div.my-1.d-flex.justify-content-center 
+      img.img-fluid(src=`data:${item.img.contentType};base64,${item.img.data}`)
+
   div.d-flex
     p.fs-6 #[strong Price:] $ 
       span.fs-5 #{item.price}
@@ -21,4 +25,3 @@ block content
   div.mt-5
     a(href=item.url + '/update') Update 
     a.ms-2(href=item.url + '/delete') Delete 
-    

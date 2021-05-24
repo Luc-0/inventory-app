@@ -3,7 +3,10 @@ const Category = require('../models/category');
 
 const async = require('async');
 const { isValidObjectId } = require('mongoose');
-const { body, validationResult } = require('express-validator');
+const { body, validationResult, check } = require('express-validator');
+const multer = require('multer');
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
 
 exports.itemList = (req, res, next) => {
   Item.find()
@@ -56,6 +59,7 @@ exports.createGet = (req, res, next) => {
   });
 };
 exports.createPost = [
+  upload.single('photo'),
   (req, res, next) => {
     if (!(req.body.category instanceof Array)) {
       if (typeof req.body.category === 'undefined') {
@@ -93,6 +97,27 @@ exports.createPost = [
     .isFloat({ min: 0, max: 1000000 })
     .withMessage('Price must be in 0-1000000 range'),
   body('category.*').escape(),
+  check('photo').custom((value, { req }) => {
+    if (!req.file) {
+      return true;
+    }
+    if (req.file.size > 5242880) {
+      throw new Error('Maximum of 5mb size.');
+    }
+    return true;
+  }),
+  check('photo').custom((value, { req }) => {
+    if (!req.file) {
+      return true;
+    }
+
+    const isImg = req.file.mimetype.match(/^image/i);
+    if (!isImg) {
+      throw new Error('Only images');
+    }
+
+    return true;
+  }),
   (req, res, next) => {
     const result = validationResult(req);
     const hasErrors = !result.isEmpty();
@@ -104,6 +129,11 @@ exports.createPost = [
       price: req.body.price,
       category: req.body.category,
     });
+
+    if (req.file) {
+      item.img.data = req.file.buffer.toString('base64');
+      item.img.contentType = req.file.mimetype;
+    }
 
     if (hasErrors) {
       Category.find({}, 'name', function (err, categories) {
@@ -181,6 +211,7 @@ exports.updateGet = (req, res, next) => {
   );
 };
 exports.updatePost = [
+  upload.single('photo'),
   (req, res, next) => {
     if (!(req.body.category instanceof Array)) {
       if (typeof req.body.category === 'undefined') {
@@ -218,6 +249,27 @@ exports.updatePost = [
     .isFloat({ min: 0, max: 1000000 })
     .withMessage('Price must be in 0-1000000 range'),
   body('category.*').escape(),
+  check('photo').custom((value, { req }) => {
+    if (!req.file) {
+      return true;
+    }
+    if (req.file.size > 5242880) {
+      throw new Error('Maximum of 5mb size.');
+    }
+    return true;
+  }),
+  check('photo').custom((value, { req }) => {
+    if (!req.file) {
+      return true;
+    }
+
+    const isImg = req.file.mimetype.match(/^image/i);
+    if (!isImg) {
+      throw new Error('Only images');
+    }
+
+    return true;
+  }),
   (req, res, next) => {
     const result = validationResult(req);
     const hasErrors = !result.isEmpty();
@@ -230,6 +282,11 @@ exports.updatePost = [
       category: req.body.category,
       _id: req.params.id,
     });
+
+    if (req.file) {
+      item.img.data = req.file.buffer.toString('base64');
+      item.img.contentType = req.file.mimetype;
+    }
 
     if (hasErrors) {
       Category.find({}, 'name', function (err, categories) {
